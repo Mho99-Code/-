@@ -154,6 +154,37 @@
     }
     .doc-desc { font-size: 13.5px; color: rgba(6,24,31,0.6); margin-top: 10px; line-height: 1.7; }
 
+    /* -------- BOOKING FORM -------- */
+    .booking-card {
+        background: #fff; border: 1px solid var(--line); border-radius: 24px;
+        padding: 36px; max-width: 720px;
+    }
+    .b-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .b-field label {
+        display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--ink);
+    }
+    .b-field.full { margin-bottom: 18px; }
+    .b-field input, .b-field select, .b-field textarea {
+        width: 100%; padding: 13px 14px; border: 1px solid var(--line); border-radius: 10px;
+        font-family: 'Tajawal', sans-serif; font-size: 15px; background: var(--paper);
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+    .b-field input:focus, .b-field select:focus, .b-field textarea:focus {
+        outline: none; border-color: var(--mint); box-shadow: 0 0 0 4px rgba(0,217,160,0.15);
+    }
+    .book-submit { border: none; cursor: pointer; width: 100%; margin-top: 6px; }
+    .book-submit:disabled { opacity: .6; cursor: not-allowed; }
+    #bookingStatus.status {
+        margin-top: 18px; padding: 13px; border-radius: 10px; display: none; text-align: center; font-weight: 700; font-size: 14.5px;
+    }
+    #bookingStatus.success { background: var(--paper-2); color: var(--mint-dark); display: block; }
+    #bookingStatus.error { background: #ffe3e6; color: #a3273a; display: block; }
+
+    @media (max-width: 640px) {
+        .b-row { grid-template-columns: 1fr; }
+        .booking-card { padding: 24px; }
+    }
+
     /* -------- CTA BAND -------- */
     .cta-band {
         background: linear-gradient(120deg, var(--ink), #0c2a35);
@@ -199,7 +230,7 @@
             <a href="#doctors">أطباؤنا</a>
             <a href="#contact">تواصل معنا</a>
         </div>
-        <a class="nav-cta" href="tel:+249 90 178 3383">احجز الآن</a>
+        <a class="nav-cta" href="tel: 090 178 3383">احجز الآن</a>
     </div>
 </nav>
 
@@ -210,7 +241,7 @@
             <h1 class="hero-anim d1">ابتسامة أوضح<br><span class="accent">ثقة أكتر.</span></h1>
             <p class="lead hero-anim d2">عيادة متخصصة في جميع تخصصات طب الأسنان — تقويم، وحشو وعلاج جذور، وجراحة وزراعة — بمتابعة شخصية من أول استشارة لحد آخر جلسة.</p>
             <div class="hero-actions hero-anim d3">
-                <a class="btn btn-primary" href="https://wa.me/+249 90 178 3383" target="_blank">احجز عبر واتساب</a>
+                <a class="btn btn-primary" href="https://wa.me/2099683502" target="_blank">احجز عبر واتساب</a>
                 <a class="btn btn-ghost" href="#services">تعرف على خدماتنا</a>
             </div>
         </div>
@@ -234,7 +265,7 @@
     <div class="wrap">
         <div class="stat"><b>٣</b><span>أطباء متخصصون تحت سقف واحد</span></div>
         <div class="stat"><b>يوميًا</b><span>نستقبل الحالات كل أيام الأسبوع</span></div>
-        <div class="stat"><b>🦷</b><span>كل مجالات العلاج رئيسية</span></div>
+        <div class="stat"><b>٣</b><span>مجالات علاج رئيسية</span></div>
     </div>
 </div>
 
@@ -264,11 +295,56 @@
                 <div class="lead-badge">مدير الفريق الطبي</div>
                 <div class="doc-avatar">ع</div>
                 <h3>د. عثمان هشام عثمان</h3>
-                <span>أخصائي جميع تخصصات طب الأسنان</span>
-                <p class="doc-desc"> تقويم الأسنان، وحشو وعلاج الجذور، وجراحة وزراعة الأسنان.</p>
+                <span>استشاري  طب الأسنان</span>
+                <p class="doc-desc">يغطي تقويم الأسنان، وحشو وعلاج الجذور، وجراحة وزراعة الأسنان.</p>
             </div>
             <div class="doc-card"><div class="doc-avatar">س</div><h3>د. سارة</h3><span>حشو وجذور</span></div>
-            <div class="doc-card"><div class="doc-avatar">ع</div><h3>د.عماد </h3><span>جراحة وزراعة</span></div>
+            <div class="doc-card"><div class="doc-avatar">ع</div><h3>د.عماد</h3><span>جراحة وزراعة</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="booking">
+    <div class="wrap">
+        <div class="section-head">
+            <div class="eyebrow">احجز موعدك</div>
+            <h2>سجّل بياناتك، وهنتواصل معاك لتأكيد الموعد</h2>
+            <p>البيانات بتوصل مباشرة لفريق الاستقبال، وهيتم التواصل معاك في أقرب وقت.</p>
+        </div>
+        <div class="booking-card">
+            <form id="bookingForm">
+                <div class="b-row">
+                    <div class="b-field">
+                        <label>الاسم بالكامل</label>
+                        <input type="text" id="b_name" required placeholder="مثال: أحمد محمد علي">
+                    </div>
+                    <div class="b-field">
+                        <label>رقم الهاتف</label>
+                        <input type="tel" id="b_phone" required placeholder="09xxxxxxx">
+                    </div>
+                </div>
+                <div class="b-row">
+                    <div class="b-field">
+                        <label>الطبيب المطلوب</label>
+                        <select id="b_doctor" required>
+                            <option value="">-- اختر الدكتور --</option>
+                            <option value="dr_ahmed">أ.د. عثمان هشام عثمان (جميع التخصصات)</option>
+                            <option value="dr_sara">د. سارة (حشو وجذور)</option>
+                            <option value="dr_omda">د. عماد (جراحة وزراعة)</option>
+                        </select>
+                    </div>
+                    <div class="b-field">
+                        <label>الوقت المفضل للتواصل</label>
+                        <input type="text" id="b_time_pref" placeholder="مثال: بعد العصر">
+                    </div>
+                </div>
+                <div class="b-field full">
+                    <label>سبب الزيارة / ملاحظات</label>
+                    <textarea id="b_notes" rows="3" placeholder="مثال: عايز أستشير في تقويم الأسنان"></textarea>
+                </div>
+                <button type="submit" id="bookingSubmitBtn" class="btn btn-primary book-submit">إرسال طلب الحجز</button>
+            </form>
+            <div id="bookingStatus" class="status"></div>
         </div>
     </div>
 </section>
@@ -279,8 +355,8 @@
             <h2>جاهزين تبتسموا من قلبكم؟</h2>
             <p>احجزوا معاد دلوقتي، وفريقنا هيتواصل معاكم لتأكيد الموعد.</p>
             <div class="cta-actions">
-                <a class="btn btn-primary" href="https://wa.me/+249 90 178 3383" target="_blank">واتساب: +249 90 178 3383</a>
-                <a class="btn btn-ghost" style="border-color:rgba(243,251,248,0.3); color:#fff;" href="tel:+249 90 178 3383">اتصل الآن</a>
+                <a class="btn btn-primary" href="https://wa.me/ 090 178 3383" target="_blank">واتساب:  090 178 3383</a>
+                <a class="btn btn-ghost" style="border-color:rgba(243,251,248,0.3); color:#fff;" href="tel: 090 178 3383">اتصل الآن</a>
             </div>
         </div>
     </div>
@@ -291,14 +367,14 @@
         <div class="foot-grid">
             <div class="brand"><span class="dot"></span> White Smile</div>
             <div class="foot-info">
-                📞 +249 90 178 3383<br>
+                📞  090 178 3383<br>
                 🕐 نستقبل الحالات يوميًا<br>
                 📍 الخرطوم - شاع الستين 
                 📍بحري - شارع المعونه 
                 📍امدرمان - شارع الوادي 
             </div>
         </div>
-        <div class="foot-copy">© 2026 White Smile — عيادة الأسنان</div>
+        <div class="foot-copy">© MH  2026 White Smile — عيادة الأسنان</div>
     </div>
 </footer>
 
@@ -307,6 +383,65 @@
         entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in-view'); });
     }, { threshold: 0.15 });
     document.querySelectorAll('.card, .doc-card').forEach(el => io.observe(el));
+
+    // ---------- فورم الحجز: يرسل لنفس الـ n8n webhook المستخدم في فورم الاستقبال ----------
+    // ⚠️ لازم يكون ده نفس الرابط بالظبط اللي في فورم الاستقبال (index.html) ونفس الرابط
+    // اللي أمر ngrok شغال بيه على جهاز العيادة.
+    const N8N_WEBHOOK_URL = 'https://gondola-jargon-brook.ngrok-free.dev/webhook/dental-patient';
+
+    const bookingForm = document.getElementById('bookingForm');
+    bookingForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const btn = document.getElementById('bookingSubmitBtn');
+        const statusDiv = document.getElementById('bookingStatus');
+
+        btn.disabled = true;
+        btn.innerText = 'جاري الإرسال...';
+        statusDiv.style.display = 'none';
+
+        const doctorSelect = document.getElementById('b_doctor');
+        const payload = {
+            patient_name: document.getElementById('b_name').value,
+            patient_phone: document.getElementById('b_phone').value,
+            doctor_id: doctorSelect.value,
+            doctor_name: doctorSelect.options[doctorSelect.selectedIndex].text,
+            amount_paid: 'حجز أونلاين - لم يُدفع بعد',
+            medical_notes:
+                'طلب حجز من الموقع التعريفي. الوقت المفضل للتواصل: ' +
+                (document.getElementById('b_time_pref').value || 'غير محدد') +
+                '. ملاحظات: ' +
+                (document.getElementById('b_notes').value || 'لا يوجد'),
+            timestamp: new Date().toISOString()
+        };
+
+        try {
+            const response = await fetch(N8N_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                statusDiv.className = 'status success';
+                statusDiv.innerText = '✅ تم إرسال طلب الحجز! هيتم التواصل معاك قريبًا لتأكيد الموعد.';
+                statusDiv.style.display = 'block';
+                bookingForm.reset();
+            } else {
+                statusDiv.className = 'status error';
+                statusDiv.innerText = '❌ حصل خطأ أثناء الإرسال، جرب تاني أو تواصل معانا مباشرة عبر واتساب.';
+                statusDiv.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Booking fetch error:', error);
+            statusDiv.className = 'status error';
+            statusDiv.innerText = '❌ تعذر الاتصال بالسيرفر. جرب تاني بعد شوية أو تواصل معانا عبر واتساب.';
+            statusDiv.style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'إرسال طلب الحجز';
+        }
+    });
 </script>
 
 </body>
