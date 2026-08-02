@@ -174,13 +174,52 @@
     .b-field input:focus, .b-field select:focus, .b-field textarea:focus {
         outline: none; border-color: var(--mint); box-shadow: 0 0 0 4px rgba(0,217,160,0.15);
     }
-    .book-submit { border: none; cursor: pointer; width: 100%; margin-top: 6px; }
-    .book-submit:disabled { opacity: .6; cursor: not-allowed; }
+    .book-submit { border: none; cursor: pointer; width: 100%; margin-top: 6px; position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .book-submit:disabled { opacity: .75; cursor: not-allowed; }
+    .btn-spinner {
+        width: 18px; height: 18px; border-radius: 50%;
+        border: 2.5px solid rgba(0,0,0,0.25); border-top-color: var(--ink);
+        animation: spin .7s linear infinite; display: none;
+    }
+    .book-submit.loading .btn-spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .booking-draft-banner {
+        background: #fff8db; color: #6b5300; padding: 14px 16px; border-radius: 12px;
+        margin-bottom: 18px; font-size: 14px; display: none; text-align: center; line-height: 1.8;
+    }
+    .booking-draft-banner button {
+        margin: 8px 6px 0; padding: 8px 16px; font-size: 13.5px; border-radius: 8px; border: none;
+        cursor: pointer; font-weight: 700;
+    }
+    .booking-draft-banner .restore-btn { background: var(--mint); color: var(--ink); }
+    .booking-draft-banner .discard-btn { background: #e3e3e3; color: #333; }
+
     #bookingStatus.status {
         margin-top: 18px; padding: 13px; border-radius: 10px; display: none; text-align: center; font-weight: 700; font-size: 14.5px;
     }
-    #bookingStatus.success { background: var(--paper-2); color: var(--mint-dark); display: block; }
     #bookingStatus.error { background: #ffe3e6; color: #a3273a; display: block; }
+
+    /* -------- BOOKING SUCCESS / THANK-YOU VIEW -------- */
+    .booking-success {
+        text-align: center; padding: 10px 6px 6px;
+    }
+    .booking-success .check-circle {
+        width: 68px; height: 68px; border-radius: 50%; background: var(--paper-2);
+        color: var(--mint-dark); font-size: 34px; display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 18px; animation: pop .35s ease-out;
+    }
+    .booking-success h3 { font-size: 21px; margin-bottom: 8px; }
+    .booking-success p.sub { color: rgba(0,0,0,0.55); font-size: 14.5px; margin-bottom: 22px; }
+    .booking-summary {
+        background: var(--paper); border: 1px solid var(--line); border-radius: 14px;
+        padding: 18px 20px; text-align: right; margin-bottom: 24px; font-size: 14.5px; line-height: 2.1;
+    }
+    .booking-summary b { color: var(--ink); }
+    .booking-success-actions { display: flex; flex-direction: column; gap: 12px; }
+    .booking-success-actions .btn { width: 100%; }
+    .btn-whatsapp { background: #25d366; color: #fff; }
+    .btn-whatsapp:hover { filter: brightness(0.95); }
 
     @media (max-width: 640px) {
         .b-row { grid-template-columns: 1fr; }
@@ -311,39 +350,62 @@
             <p> كل البيانات بتوصل مباشرة لفريق الاستقبال، وسوف يتم  التواصل معاك في أقرب وقت  .</p>
         </div>
         <div class="booking-card">
-            <form id="bookingForm">
-                <div class="b-row">
-                    <div class="b-field">
-                        <label>الاسم بالكامل</label>
-                        <input type="text" id="b_name" required placeholder="مثال: محمد هشام عثمان ">
+            <div id="bookingDraftBanner" class="booking-draft-banner">
+                ⚠️ فيه بيانات حجز محفوظة من محاولة سابقة لم تكتمل.
+                <br>
+                <button type="button" id="bookingRestoreBtn" class="restore-btn">استرجاع البيانات</button>
+                <button type="button" id="bookingDiscardBtn" class="discard-btn">تجاهل</button>
+            </div>
+
+            <div id="bookingFormWrap">
+                <form id="bookingForm">
+                    <div class="b-row">
+                        <div class="b-field">
+                            <label>الاسم بالكامل</label>
+                            <input type="text" id="b_name" required placeholder="مثال: محمد هشام عثمان ">
+                        </div>
+                        <div class="b-field">
+                            <label>رقم الهاتف</label>
+                            <input type="tel" id="b_phone" required placeholder="09xxxxxxx">
+                        </div>
                     </div>
-                    <div class="b-field">
-                        <label>رقم الهاتف</label>
-                        <input type="tel" id="b_phone" required placeholder="09xxxxxxx">
+                    <div class="b-row">
+                        <div class="b-field">
+                            <label>الطبيب المطلوب</label>
+                            <select id="b_doctor" required>
+                                <option value="">-- اختر الدكتور --</option>
+                                <option value="dr_ahmed">د. عثمان هشام عثمان ( متخصص في جراحة وزراعة الاسنان )</option>
+                                <option value="dr_sara">د. سارة ( متخصصه في حشو وعلاج  الجذور )</option>
+                                <option value="dr_omda">د. عماد  (متخصص في تقويم  الاسنان )</option>
+                            </select>
+                        </div>
+                        <div class="b-field">
+                            <label>الوقت المفضل للتواصل</label>
+                            <input type="text" id="b_time_pref" placeholder="مثال: يوم الخميس 9:00 مساء ">
+                        </div>
                     </div>
+                    <div class="b-field full">
+                        <label>سبب الزيارة / ملاحظات</label>
+                        <textarea id="b_notes" rows="3" placeholder="مثال: داير  أستشاره  في تقويم الأسنان"></textarea>
+                    </div>
+                    <button type="submit" id="book_submit_btn" class="btn btn-primary book-submit">
+                        <span class="btn-spinner"></span>
+                        <span class="btn-label">ارسل طلب الحجز</span>
+                    </button>
+                </form>
+                <div id="bookingStatus" class="status"></div>
+            </div>
+
+            <div id="bookingSuccessView" class="booking-success" style="display:none;">
+                <div class="check-circle">✓</div>
+                <h3>تم استلام طلب الحجز!</h3>
+                <p class="sub">هيتم التواصل معاك قريبًا لتأكيد الموعد. تقدر كمان تأكد الحجز فورًا عبر واتساب.</p>
+                <div class="booking-summary" id="bookingSummaryText"></div>
+                <div class="booking-success-actions">
+                    <a id="bookingWhatsappBtn" class="btn btn-whatsapp" target="_blank">تأكيد الحجز عبر واتساب</a>
+                    <button type="button" id="bookAnotherBtn" class="btn btn-ghost">حجز موعد تاني</button>
                 </div>
-                <div class="b-row">
-                    <div class="b-field">
-                        <label>الطبيب المطلوب</label>
-                        <select id="b_doctor" required>
-                            <option value="">-- اختر الدكتور --</option>
-                            <option value="dr_ahmed">د. عثمان هشام عثمان ( متخصص في جراحة وزراعة الاسنان )</option>
-                            <option value="dr_sara">د. سارة ( متخصصه في حشو وعلاج  الجذور )</option>
-                            <option value="dr_omda">د. عماد  (متخصص في تقويم  الاسنان )</option>
-                        </select>
-                    </div>
-                    <div class="b-field">
-                        <label>الوقت المفضل للتواصل</label>
-                        <input type="text" id="b_time_pref" placeholder="مثال: يوم الخميس 9:00 مساء ">
-                    </div>
-                </div>
-                <div class="b-field full">
-                    <label>سبب الزيارة / ملاحظات</label>
-                    <textarea id="b_notes" rows="3" placeholder="مثال: داير  أستشاره  في تقويم الأسنان"></textarea>
-                </div>
-                <button type="submit" id="type" class="btn btn-primary book-submit">ارسل طلب الحجز </button>
-            </form>
-            <div id="bookingStatus" class="status"></div>
+            </div>
         </div>
     </div>
 </section>
@@ -354,8 +416,8 @@
             <h2>جاهزين تبتسموا من قلبكم؟</h2>
             <p>احجزوا معاد الان لا تفوفت الفرصه ، وفريقنا هيتواصل معاكم لتأكيد الموعد.</p>
             <div class="cta-actions">
-                <a class="btn btn-primary" href="https://wa.me/2099683502" target="_blank">واتساب: 099683502</a>
-                <a class="btn btn-ghost" style="border-color:rgba(243,251,248,0.3); color:#fff;" href="tel:099683502">  اتصل الآن واحجز معنا </a>
+                <a class="btn btn-primary" href="https://wa.me/2099683502" target="_blank">واتساب: 24999683502</a>
+                <a class="btn btn-ghost" style="border-color:rgba(243,251,248,0.3); color:#fff;" href="tel:24999683502">  اتصل الآن واحجز معنا </a>
             </div>
         </div>
     </div>
@@ -367,7 +429,7 @@
             <div class="brand"><span class="dot"></span> White Smile</div>
             <div class="foot-info">
                 📞 099683502<br>
-                🕐 نستقبل الحالات يوميًا<br>
+                🕐 نستقبل الحالات من الاحد -الخميس <br>
                 📍 الخرطوم - شاع الستين 
                 📍بحري - شارع المعونه 
                 📍امدرمان - شارع الوادي 
@@ -383,49 +445,118 @@
     }, { threshold: 0.15 });
     document.querySelectorAll('.card, .doc-card').forEach(el => io.observe(el));
 
-    // ---------- فورم الحجز: يرسل لنفس الـ n8n webhook المستخدم في فورم الاستقبال ----------
-    // ⚠️ لازم يكون ده نفس الرابط بالظبط اللي في فورم الاستقبال (index.html) ونفس الرابط
-    // اللي أمر ngrok شغال بيه على جهاز العيادة.
-    const N8N_WEBHOOK_URL = 'https://gondola-jargon-brook.ngrok-free.dev/webhook/dental-patient';
+    // ---------- فورم الحجز: يرسل لنفس رابط Google Apps Script المستخدم في فورم الاستقبال ----------
+    // ⚠️ لازم يكون ده نفس الرابط بالظبط اللي في فورم الاستقبال (clinic-form)، لأن السكريبت
+    // نفسه (Code.gs) هو اللي بيستقبل من الصفحتين مع بعض.
+    const N8N_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxaGA1TAkAqbbqkE039s5LhfOiezPfvrhJ9DtamArIWkZBNcCOuShSzMXC9aFyB1CkI/exec';
 
     const bookingForm = document.getElementById('bookingForm');
+    const bookingFormWrap = document.getElementById('bookingFormWrap');
+    const bookingSuccessView = document.getElementById('bookingSuccessView');
+    const bField = { name: 'b_name', phone: 'b_phone', doctor: 'b_doctor', time: 'b_time_pref', notes: 'b_notes' };
+    const bookingFieldIds = Object.values(bField);
+
+    // ---------- 5) حفظ واسترجاع مسودة الحجز محليًا ----------
+    const BOOKING_DRAFT_KEY = 'booking_form_draft_v1';
+
+    function getBookingDraft() {
+        try {
+            const raw = localStorage.getItem(BOOKING_DRAFT_KEY);
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) { return null; }
+    }
+    function saveBookingDraft() {
+        const draft = {};
+        bookingFieldIds.forEach(id => { draft[id] = document.getElementById(id).value; });
+        try { localStorage.setItem(BOOKING_DRAFT_KEY, JSON.stringify(draft)); } catch (e) {}
+    }
+    function clearBookingDraft() {
+        try { localStorage.removeItem(BOOKING_DRAFT_KEY); } catch (e) {}
+    }
+    function applyBookingDraft(draft) {
+        bookingFieldIds.forEach(id => {
+            if (draft[id] !== undefined) document.getElementById(id).value = draft[id];
+        });
+    }
+
+    const savedBookingDraft = getBookingDraft();
+    const bookingDraftBanner = document.getElementById('bookingDraftBanner');
+    if (savedBookingDraft) bookingDraftBanner.style.display = 'block';
+
+    document.getElementById('bookingRestoreBtn').addEventListener('click', function () {
+        if (savedBookingDraft) applyBookingDraft(savedBookingDraft);
+        bookingDraftBanner.style.display = 'none';
+    });
+    document.getElementById('bookingDiscardBtn').addEventListener('click', function () {
+        clearBookingDraft();
+        bookingDraftBanner.style.display = 'none';
+    });
+
+    // ---------- إرسال الفورم ----------
     bookingForm.addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        const btn = document.getElementById('btn btn-primary book-submit');
+        const btn = document.getElementById('book_submit_btn');
+        const btnLabel = btn.querySelector('.btn-label');
         const statusDiv = document.getElementById('bookingStatus');
 
         btn.disabled = true;
-        btn.innerText = 'جاري الإرسال...';
+        btn.classList.add('loading'); // 3) سبينر التحميل
+        btnLabel.innerText = 'جاري الإرسال...';
         statusDiv.style.display = 'none';
 
+        const nameVal = document.getElementById('b_name').value;
+        const phoneVal = document.getElementById('b_phone').value;
         const doctorSelect = document.getElementById('b_doctor');
+        const doctorNameVal = doctorSelect.options[doctorSelect.selectedIndex].text;
+        const timePrefVal = document.getElementById('b_time_pref').value || 'غير محدد';
+        const notesVal = document.getElementById('b_notes').value || 'لا يوجد';
+
         const payload = {
-            patient_name: document.getElementById('b_name').value,
-            patient_phone: document.getElementById('b_phone').value,
+            patient_name: nameVal,
+            patient_phone: phoneVal,
             doctor_id: doctorSelect.value,
-            doctor_name: doctorSelect.options[doctorSelect.selectedIndex].text,
+            doctor_name: doctorNameVal,
             amount_paid: 'حجز أونلاين - لم يُدفع بعد',
             medical_notes:
-                'طلب حجز من الموقع التعريفي. الوقت المفضل للتواصل: ' +
-                (document.getElementById('b_time_pref').value || 'غير محدد') +
-                '. ملاحظات: ' +
-                (document.getElementById('b_notes').value || 'لا يوجد'),
+                'طلب حجز من الموقع التعريفي. الوقت المفضل للتواصل: ' + timePrefVal +
+                '. ملاحظات: ' + notesVal,
             timestamp: new Date().toISOString()
         };
+
+        saveBookingDraft();
 
         try {
             const response = await fetch(N8N_WEBHOOK_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             });
 
             if (response.ok) {
-                statusDiv.className = 'status success';
-                statusDiv.innerText = '✅ تم إرسال طلب الحجز! هيتم التواصل معاك قريبًا لتأكيد الموعد.';
-                statusDiv.style.display = 'block';
-                bookingForm.reset();
+                clearBookingDraft();
+                bookingDraftBanner.style.display = 'none';
+
+                // 4) عرض شاشة شكر منفصلة بدل رسالة صغيرة
+                document.getElementById('bookingSummaryText').innerHTML =
+                    '<div><b>الاسم:</b> ' + escapeHtml(nameVal) + '</div>' +
+                    '<div><b>الهاتف:</b> ' + escapeHtml(phoneVal) + '</div>' +
+                    '<div><b>الطبيب:</b> ' + escapeHtml(doctorNameVal) + '</div>' +
+                    '<div><b>الوقت المفضل:</b> ' + escapeHtml(timePrefVal) + '</div>';
+
+                // 1) رسالة واتساب جاهزة مسبقًا لتأكيد الحجز
+                const waMessage =
+                    'مرحبًا، عايز أأكد حجزي في عيادة White Smile:' +
+                    '\nالاسم: ' + nameVal +
+                    '\nالهاتف: ' + phoneVal +
+                    '\nالطبيب المطلوب: ' + doctorNameVal +
+                    '\nالوقت المفضل: ' + timePrefVal;
+                document.getElementById('bookingWhatsappBtn').href =
+                    'https://wa.me/24999683502?text=' + encodeURIComponent(waMessage);
+
+                bookingFormWrap.style.display = 'none';
+                bookingSuccessView.style.display = 'block';
+                bookingSuccessView.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } else {
                 statusDiv.className = 'status error';
                 statusDiv.innerText = '❌ حصل خطأ أثناء الإرسال، جرب تاني أو تواصل معانا مباشرة عبر واتساب.';
@@ -434,13 +565,29 @@
         } catch (error) {
             console.error('Booking fetch error:', error);
             statusDiv.className = 'status error';
-            statusDiv.innerText = '❌ تعذر الاتصال بالسيرفر. جرب تاني بعد شوية أو تواصل معانا عبر واتساب.';
+            statusDiv.innerText = '❌ تعذر الاتصال بالسيرفر. البيانات محفوظة عندك مؤقتًا - جرب تاني بعد شوية أو تواصل معانا عبر واتساب.';
             statusDiv.style.display = 'block';
         } finally {
             btn.disabled = false;
-            btn.innerText = 'إرسال طلب الحجز';
+            btn.classList.remove('loading');
+            btnLabel.innerText = 'ارسل طلب الحجز';
         }
     });
+
+    // زرار "حجز موعد تاني": يرجع الفورم فاضي من جديد
+    document.getElementById('bookAnotherBtn').addEventListener('click', function () {
+        bookingForm.reset();
+        bookingSuccessView.style.display = 'none';
+        bookingFormWrap.style.display = 'block';
+        bookingFormWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
 </script>
 
 </body>
