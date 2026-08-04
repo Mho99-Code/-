@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -268,7 +268,7 @@
             <a href="#doctors">أطباؤنا</a>
             <a href="#contact">تواصل معنا</a>
         </div>
-        <a class="nav-cta" href="tel:099683502">احجز الآن</a>
+        <a class="nav-cta" href="tel:0996832502">احجز الآن</a>
     </div>
 </nav>
 
@@ -279,7 +279,7 @@
             <h1 class="hero-anim d1">ابتسامة أوضح<br><span class="accent">ثقة أكتر.</span></h1>
             <p class="lead hero-anim d2">عيادة متخصصة في جميع تخصصات طب الأسنان — تقويم  وتبيض الاسنان وحشو وعلاج جذور  وجراحة وزراعة — بمتابعة شخصية من أول استشارة لحد آخر جلسة.</p>
             <div class="hero-actions hero-anim d3">
-                <a class="btn btn-primary" href="https://wa.me/2099683502" target="_blank">احجز عبر واتساب</a>
+                <a class="btn btn-primary" href="https://wa.me/249996832502" target="_blank">احجز عبر واتساب</a>
                 <a class="btn btn-ghost" href="#services">تعرف على خدماتنا</a>
             </div>
         </div>
@@ -416,8 +416,8 @@
             <h2>جاهزين تبتسموا من قلبكم؟</h2>
             <p>احجزوا معاد الان لا تفوفت الفرصه ، وفريقنا هيتواصل معاكم لتأكيد الموعد.</p>
             <div class="cta-actions">
-                <a class="btn btn-primary" href="https://wa.me/2099683502" target="_blank">واتساب: 24999683502</a>
-                <a class="btn btn-ghost" style="border-color:rgba(243,251,248,0.3); color:#fff;" href="tel:24999683502">  اتصل الآن واحجز معنا </a>
+                <a class="btn btn-primary" href="https://wa.me/249996832502" target="_blank">واتساب: 0996832502</a>
+                <a class="btn btn-ghost" style="border-color:rgba(243,251,248,0.3); color:#fff;" href="tel:0996832502">  اتصل الآن واحجز معنا </a>
             </div>
         </div>
     </div>
@@ -428,8 +428,8 @@
         <div class="foot-grid">
             <div class="brand"><span class="dot"></span> White Smile</div>
             <div class="foot-info">
-                📞 099683502<br>
-                🕐 نستقبل الحالات من الاحد -الخميس <br>
+                📞 0996832502<br>
+                🕐 نستقبل الحالات يوميًا<br>
                 📍 الخرطوم - شاع الستين 
                 📍بحري - شارع المعونه 
                 📍امدرمان - شارع الوادي 
@@ -445,7 +445,9 @@
     }, { threshold: 0.15 });
     document.querySelectorAll('.card, .doc-card').forEach(el => io.observe(el));
 
-
+    // ---------- فورم الحجز: يرسل لنفس رابط Google Apps Script المستخدم في فورم الاستقبال ----------
+    // ⚠️ لازم يكون ده نفس الرابط بالظبط اللي في فورم الاستقبال (clinic-form)، لأن السكريبت
+    // نفسه (Code.gs) هو اللي بيستقبل من الصفحتين مع بعض.
     const N8N_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwaJU3q_zr1npQ4Z-X9Op_zSNNzvmFH5vQf9d_iDZgI1pfB3Ag7IiHSQAocX5gag6aA/exec';
 
     const bookingForm = document.getElementById('bookingForm');
@@ -510,7 +512,8 @@
         const timePrefVal = document.getElementById('b_time_pref').value || 'غير محدد';
         const notesVal = document.getElementById('b_notes').value || 'لا يوجد';
 
-        const payload = {form_type: 'booking',
+        const payload = {
+            form_type: 'booking',
             patient_name: nameVal,
             patient_phone: phoneVal,
             doctor_id: doctorSelect.value,
@@ -531,7 +534,11 @@
                 body: JSON.stringify(payload)
             });
 
-            if (response.ok) {
+            const resultText = await response.text();
+            let result;
+            try { result = JSON.parse(resultText); } catch (e) { result = null; }
+
+            if (response.ok && result && result.status === 'ok') {
                 clearBookingDraft();
                 bookingDraftBanner.style.display = 'none';
 
@@ -550,14 +557,14 @@
                     '\nالطبيب المطلوب: ' + doctorNameVal +
                     '\nالوقت المفضل: ' + timePrefVal;
                 document.getElementById('bookingWhatsappBtn').href =
-                    'https://wa.me/24999683502?text=' + encodeURIComponent(waMessage);
+                    'https://wa.me/249996832502?text=' + encodeURIComponent(waMessage);
 
                 bookingFormWrap.style.display = 'none';
                 bookingSuccessView.style.display = 'block';
                 bookingSuccessView.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } else {
                 statusDiv.className = 'status error';
-                statusDiv.innerText = '❌ حصل خطأ أثناء الإرسال، جرب تاني أو تواصل معانا مباشرة عبر واتساب.';
+                statusDiv.innerText = '❌ الخادم رد بخطأ فعلي: ' + (result && result.message ? result.message : resultText);
                 statusDiv.style.display = 'block';
             }
         } catch (error) {
